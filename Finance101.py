@@ -2,7 +2,9 @@ import pandas as pd
 import os
 import matplotlib.pyplot as plt
 import numpy as np
+import requests
 import time
+import io
 
 dfStock = pd.read_csv("table.csv")
 
@@ -41,29 +43,36 @@ def get_data(stocks, dates):
     return df
 
 
-def plot_data(df, title="Stock prices"):
-    ax = df.plot(title=title)
-    ax.set_xlabel("Date")
-    ax.set_ylabel("Price")
+def plot_data(df, title="Stock prices", xlabel="Date", ylabel="Price"):
+    """Plot stock prices with a custom title and meaningful axis labels."""
+    ax = df.plot(title=title, fontsize=12)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
     plt.show()
-
-
-def test_run():
-    dates = pd.date_range('2017-03-29', '2017-04-26')
-    stocks = ['AAPL', 'IBM', 'GLD']
-    df = get_data(stocks, dates)
-    # df = normalize_data(df)
-    # plot_data(df)
-    # plot_selected(df, [2 , 3], '2017-03-29', '2017-04-26')
-    print(df)
 
 
 def get_max_index(a):
     return a.argmax()
 
 
+def get_stock_info(name, start_date, end_date):
+    first = start_date.find("/")
+    second = (start_date[first + 1:]).find("/")
+    third = end_date.find("/")
+    fourth = (end_date[third + 1:]).find("/")
+
+    url = "http://chart.finance.yahoo.com/table.csv?s=" + name + "&a=" + (start_date[first + 1:][0:second]) + "&b=" + \
+          (start_date[0:first]) + "&c=" + (start_date[first + second + 2:]) + "&d=" + (end_date[0:third]) + "&e=" + \
+          (end_date[third + 1:][0:fourth]) + "&f=" + (end_date[third + fourth + 2:]) + "&g=d&ignore=.csv"
+
+    url_data = requests.get(url).content
+    raw_data = pd.read_csv(io.StringIO(url_data.decode('utf-8')), index_col='Date', parse_dates=True,
+                           usecols=['Date', 'Close', 'Adj Close'], na_values=['--'])
+    print(raw_data)
+
+
 def check_time(a, b):
-    print("The time taken is ", b-a, " seconds.")
+    print("The time taken is ", b - a, " seconds.")
 
 
 def num_tut():
@@ -143,8 +152,7 @@ def num_tut():
     print(a[0:2, 0:2])
     # Slicing
     # slices n:m:t. it starts at n but stops before m. It will select column 0,2 of every row
-    # DON'T  UNDERSTAND THIS 01-03 - 15
-    print("Slicing: \n", a[:, 0:3:2])
+    print("Slicing: \n", a[:, 0:3:2]) gives you 0 - (3-2 and then jumps (2-1) columns
     '''
     # Assigning values
     '''
@@ -168,16 +176,125 @@ def num_tut():
     print("New a \n", a)
     '''
     # Arithmetic operations
+    '''
     a = np.array([(1, 2, 3, 4, 5), (10, 20, 30, 40, 50)])
     print("Original array \n", a)
     # Multiply by 2
     print("\n Multiply a by 2:\n", 2*a)
+    
     # Can be used to add arrays as well
     # Does element wise algorithm
+    '''
+
+    # HW - Using requests
+
+    get_stock_info("AMD", "30/03/2016", "30/03/2017")
+
+
+def get_rolling_mean(values, window):
+    """Return rolling mean of given values, using specified window size."""
+    return pd.Series.rolling(values, window=window, center=False).mean()
+
+
+def get_rolling_std(values, window):
+    """Return rolling standard deviation of given values, using specified window size."""
+    # TODO: Compute and return rolling standard deviation
+    return pd.Series.rolling(values, window=window, center=False).std()
+
+
+def get_bollinger_bands(rm, rstd):
+    """Return upper and lower Bollinger Bands."""
+    # TODO: Compute upper_band and lower_band
+    upper_band = (2 * rstd) + rm
+    lower_band = (-1 * 2 * rstd) + rm
+    return upper_band, lower_band
+
+
+def compute_daily_returns(df):
+    """Compute and return the daily return values."""
+    daily_returns = df.copy()
+    # NOTE values threw me off but it was explained
+    daily_returns[1:] = (daily_returns[1:] / daily_returns[:-1].values)-1
+    # May need some clarification on this
+    # # OR daily_returns = (df/df.shift(1))-1  still have to set first row to 0
+    daily_returns.ix[0, :] = 0
+    print(daily_returns)
+    return daily_returns
+
+
+def test_run():
+    dates = pd.date_range('2017-03-29', '2017-04-26')
+    # df = normalize_data(df)
+    # plot_data(df)
+    # plot_selected(df, [2 , 3], '2017-03-29', '2017-04-26')
+
+    # Lesson 5
+    # Global Statistics
+    # Global statistics that can be used - mean, median, std, sum, prod, mode
+    '''
+    dates = pd.date_range('2017-03-29', '2017-04-26')
+    stocks = ['AAPL', 'IBM', 'GLD']
+    df = get_data(stocks, dates)
+    plot_data(df)
+    print(df.mean())
+    '''
+    # Rolling  statistics - mean of set windows of the data (simple moving average)
+    # #### Suggestion for stock purchase, whenever stock falls below rolling mean, buy stock
+
+    '''
+    stocks = ['Google']
+    df = get_data(stocks, dates)
+    # Plot google data, retain matplotlib axis object
+    ax = df['Google ADJ'].plot(title='Google Rolling mean', label="Google")
+    # Complete Rolling mean using 20 day window
+    # Switched to version that isn't being removed
+    rm_google = pd.Series.rolling(df['Google ADJ'], window=4, center=False).mean()
+    print(rm_google)
+    rm_google.plot(label="Rolling mean", ax=ax)
+    ax.set_xlabel("Date")
+    ax.set_ylabel('Price')
+    ax.legend(loc="upper left")
+    # Used to actually show plot
+    plt.show()
+    '''
+    # Quiz
+    '''
+    # Compute Bollinger Bands
+    stocks = ['Google']
+    df = get_data(stocks, dates)
+    # 1. Compute rolling mean
+    rm_goog = get_rolling_mean(df['Google ADJ'], window=4)
+
+    # 2. Compute rolling standard deviation
+    rstd_goog = get_rolling_std(df['Google ADJ'], window=4)
+
+    # 3. Compute upper and lower bands
+    upper_band, lower_band = get_bollinger_bands(rm_goog, rstd_goog)
+
+    # Plot raw SPY values, rolling mean and Bollinger Bands
+    ax = df['Google ADJ'].plot(title="Bollinger Bands", label='Google')
+    rm_goog.plot(label='Rolling mean', ax=ax)
+    upper_band.plot(label='upper band', ax=ax)
+    lower_band.plot(label='lower band', ax=ax)
+
+    # Add axis labels and legend
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Price")
+    ax.legend(loc='upper left')
+    plt.show()
+    '''
+
+    # Quiz
+    stocks = ['Google']
+    df = get_data(stocks, dates)
+    # Compute daily returns
+    daily_returns = compute_daily_returns(df)
+    plot_data(daily_returns, title="Daily returns", ylabel="Daily returns")
+
 
 if __name__ == "__main__":
-    num_tut()
-    # test_run()
+    # num_tut()
+    test_run()
 
 
 
