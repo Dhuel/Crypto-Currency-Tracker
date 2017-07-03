@@ -1,0 +1,1 @@
+import organize_and_store as orgif __name__ == "__main__":    # Beginning of main code    # This function takes two stock icons, a time variable and a True value    org.get_stock_data("btc", 'ltc', 60, True)
