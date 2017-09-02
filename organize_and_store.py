@@ -24,7 +24,7 @@ def store_to_db(table, values):
     conn = sqlite3.connect('Records.db')
     c = conn.cursor()
     # c.execute('delete from btc_ltc')
-    # Create table if it doesn't exist
+    # Create table if it doesn't exist 
     c.execute(
         "CREATE TABLE IF NOT EXISTS " + table + " (mid real, bid real, ask real, last_price real, low real, high real," +
         "volume real, timestamp text)")

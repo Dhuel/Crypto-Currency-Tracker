@@ -18,8 +18,8 @@ def get_btce_data(first_stock, second_stock):
             url_data = requests.get(url).content
             raw_data = url_data
             try:
-                 print(json.loads(raw_data)['message'])
-                 return -1
+                print(json.loads(raw_data)['message'])
+                return -1
             except:
                 print(raw_data)
                 return raw_data

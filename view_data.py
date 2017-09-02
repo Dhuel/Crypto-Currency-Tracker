@@ -1,6 +1,5 @@
 import sqlite3
 
-
 if __name__ == "__main__":
     # This function is used to ensure the database is pulling and storing records
     conn = sqlite3.connect('Records.db')
