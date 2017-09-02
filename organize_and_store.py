@@ -13,27 +13,24 @@ def get_stock_data(first_stock, second_stock, frequency, go):
             go = False
             return 0
         d = json.loads(stock_data)
-        print(d)
-        name = next(iter(d))
-        values = [(d[name]['updated'], d[name]['high'], d[name]['low'], d[name]['avg'],
-                   d[name]['vol'], d[name]['vol_cur'], d[name]['last'], d[name]['buy'],
-                   d[name]['sell'])]
-        store_to_db(name, values)
+        values = [(d['mid'], d['bid'], d['ask'], d['last_price'], d['low'], d['high'], d['volume'], d['timestamp'])]
+        print(d['last_price'])
+        store_to_db("btc_usd", values)
         threading.Timer(frequency, get_stock_data, [first_stock, second_stock, frequency, go]).start()
 
 
 def store_to_db(table, values):
     # Function used to store information to db
-    conn = sqlite3.connect('Stock.db')
+    conn = sqlite3.connect('Records.db')
     c = conn.cursor()
     # c.execute('delete from btc_ltc')
     # Create table if it doesn't exist
     c.execute(
-        "CREATE TABLE IF NOT EXISTS " + table + " (date text, high real, low real, avg real, vol real, vol_cur real," +
-        "last real, buy real, sell real)")
+        "CREATE TABLE IF NOT EXISTS " + table + " (mid real, bid real, ask real, last_price real, low real, high real," +
+        "volume real, timestamp text)")
 
     # Insert a row of data
-    c.executemany("INSERT INTO " + table + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", values)
+    c.executemany("INSERT INTO " + table + " VALUES ( ?, ?, ?, ?, ?, ?, ?, ?)", values)
 
     # Save (commit) the changes and close db connection
     conn.commit()
