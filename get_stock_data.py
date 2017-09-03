@@ -2,7 +2,7 @@ import json
 import requests
 
 '''
-This module goes to the bitfinex API and gets the stock information
+This module goes to the bitfinex API and gets the stock information.
 '''
 
 
