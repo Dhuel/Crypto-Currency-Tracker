@@ -14,10 +14,7 @@ $ python view_data.py
 
 The required modules are:
 
-json
-sqlite3
-threading
-requests
+json, sqlite3, threading, requests,
 
 
 
