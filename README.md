@@ -3,7 +3,9 @@ This is a python module which uses the bitfinex API to pull and store crypto cur
 
 It may be started by running main.py through python
 
+'''pyhton
 $ python main.py
+'''
 
 The current version of the code allows for data to be pulled every 60 seconds. This may be edited by changing the time parameter in the main.py file.
 
