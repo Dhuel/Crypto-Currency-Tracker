@@ -1,8 +1,11 @@
 import json
 import sqlite3
 import threading
-
 import get_stock_data as get
+
+'''
+The functions in this module are used to pull the stock data, and store them into a database based on their symbols.
+'''
 
 
 def get_stock_data(first_stock, second_stock, frequency, go):
@@ -24,7 +27,7 @@ def store_to_db(table, values):
     conn = sqlite3.connect('Records.db')
     c = conn.cursor()
     # c.execute('delete from btc_ltc')
-    # Create table if it doesn't exist 
+    # Create table if it doesn't exist
     c.execute(
         "CREATE TABLE IF NOT EXISTS " + table + " (mid real, bid real, ask real, last_price real, low real, high real," +
         "volume real, timestamp text)")

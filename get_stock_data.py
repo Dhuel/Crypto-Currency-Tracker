@@ -1,6 +1,10 @@
 import json
 import requests
 
+'''
+This module goes to the bitfinex API and gets the stock information
+'''
+
 
 def get_btce_data(first_stock, second_stock):
     # code which takes 2 stocks and returns btc data
