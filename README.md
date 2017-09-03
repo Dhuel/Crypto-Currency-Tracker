@@ -1,6 +1,10 @@
 # PythonFinance
 This is a python module which uses the bitfinex API to pull and store crypto currency records locally using python.
 
+The required modules are:
+
+json, sqlite3, threading, requests
+
 It may be started by running main.py through python
 ```
 $ python main.py
@@ -12,9 +16,7 @@ To ensure that data is correctly being entered in the database, you may use the 
 $ python view_data.py
 ```
 
-The required modules are:
 
-json, sqlite3, threading, requests
 
 
 
