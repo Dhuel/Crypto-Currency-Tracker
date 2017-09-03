@@ -4,7 +4,7 @@ import threading
 import get_stock_data as get
 
 '''
-The functions in this module are used to pull the stock data, and store them into a database based on their symbols.
+The functions in this module are used to pull the stock data, and store them into a database based on their symbols
 '''
 
 
